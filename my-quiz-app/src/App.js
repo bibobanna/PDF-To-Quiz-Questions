@@ -16,6 +16,7 @@ function App() {
 
   const handleSubmit = async event => {
     event.preventDefault();
+    console.log("Form submitted");
     if (!file || !numQuestions || !apiKey) {
       alert('All fields are required!');
       return;
@@ -33,6 +34,7 @@ function App() {
       });
 
       const data = await response.json();
+      console.log("Response data:", data);
       setQuestions(data.questions.join('\n'));  // Assuming the questions are returned as an array
     } catch (error) {
       console.error('Error generating questions:', error);
