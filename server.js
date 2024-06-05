@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const fileUpload = require('express-fileupload');
 const pdfParse = require('pdf-parse');
@@ -8,8 +9,6 @@ const PORT = process.env.PORT || 3001;
 app.use(express.json());
 app.use(fileUpload());
 
-// LangChain API details
-const LANGCHAIN_API_KEY = 'your-langchain-api-key';  // Ensure this is securely stored
 const LANGCHAIN_ENDPOINT = 'https://api.langchain.com/generate-quiz';
 
 app.post('/upload', async (req, res) => {
@@ -19,20 +18,18 @@ app.post('/upload', async (req, res) => {
 
     const pdfFile = req.files.pdfFile;
 
-    // Extract text from the PDF
     pdfParse(pdfFile.data).then(text => {
-        // Make API request to LangChain
         axios.post(LANGCHAIN_ENDPOINT, {
-            text: text.text,  // Sending extracted text
-            num_questions: req.body.numQuestions  // Number of questions requested
+            text: text.text,
+            num_questions: req.body.numQuestions
         }, {
             headers: {
-                'Authorization': `Bearer ${LANGCHAIN_API_KEY}`,
+                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
                 'Content-Type': 'application/json'
             }
         })
         .then(apiResponse => {
-            res.json({ questions: apiResponse.data.questions });  // Send the quiz questions back to the frontend
+            res.json({ questions: apiResponse.data.questions });
         })
         .catch(error => {
             console.error('Error calling LangChain API:', error);
