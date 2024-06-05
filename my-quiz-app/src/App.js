@@ -4,19 +4,20 @@ function App() {
   const [file, setFile] = useState(null);
   const [numQuestions, setNumQuestions] = useState('');
   const [apiKey, setApiKey] = useState('');
+  const [questions, setQuestions] = useState('');
 
   const handleFileChange = event => {
     setFile(event.target.files[0]);
   };
 
-  const handleInputChange = (setter) => (event) => {
+  const handleInputChange = setter => event => {
     setter(event.target.value);
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async event => {
     event.preventDefault();
     if (!file || !numQuestions || !apiKey) {
-      alert("All fields are required!");
+      alert('All fields are required!');
       return;
     }
 
@@ -26,15 +27,15 @@ function App() {
     formData.append('apiKey', apiKey);
 
     try {
-      const response = await fetch('http://your-backend-url/quiz', {
+      const response = await fetch('http://localhost:3001/upload', {
         method: 'POST',
         body: formData,
       });
 
       const data = await response.json();
-      console.log("Questions generated:", data.questions);
+      setQuestions(data.questions.join('\n'));  // Assuming the questions are returned as an array
     } catch (error) {
-      console.error("Error generating questions:", error);
+      console.error('Error generating questions:', error);
     }
   };
 
@@ -43,21 +44,26 @@ function App() {
       <form onSubmit={handleSubmit}>
         <label>
           Upload PDF:
-          <input type="file" onChange={handleFileChange} accept="application/pdf"/>
+          <input type="file" onChange={handleFileChange} accept="application/pdf" />
         </label>
         <br />
         <label>
           Number of Questions:
-          <input type="number" value={numQuestions} onChange={handleInputChange(setNumQuestions)} min="1"/>
+          <input type="number" value={numQuestions} onChange={handleInputChange(setNumQuestions)} min="1" />
         </label>
         <br />
         <label>
           OpenAI API Key:
-          <input type="text" value={apiKey} onChange={handleInputChange(setApiKey)}/>
+          <input type="text" value={apiKey} onChange={handleInputChange(setApiKey)} />
         </label>
         <br />
         <button type="submit">Generate Quiz</button>
       </form>
+      <br />
+      <label>
+        Generated Quiz Questions:
+        <textarea value={questions} readOnly rows="10" cols="50" />
+      </label>
     </div>
   );
 }
