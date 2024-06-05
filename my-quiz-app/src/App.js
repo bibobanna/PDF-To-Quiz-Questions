@@ -28,14 +28,14 @@ function App() {
     formData.append('apiKey', apiKey);
 
     try {
-      const response = await fetch('http://localhost:3001/upload', {
+      const response = await fetch('http://localhost:5000/upload', {
         method: 'POST',
         body: formData,
       });
 
       const data = await response.json();
       console.log("Response data:", data);
-      setQuestions(data.questions.join('\n'));  // Assuming the questions are returned as an array
+      setQuestions(data.text);  // Adjust this if the API returns the questions directly
     } catch (error) {
       console.error('Error generating questions:', error);
     }
