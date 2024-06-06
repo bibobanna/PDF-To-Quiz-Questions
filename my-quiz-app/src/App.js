@@ -5,6 +5,7 @@ function App() {
   const [numQuestions, setNumQuestions] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [questions, setQuestions] = useState('');
+  const [error, setError] = useState('');  // State to store error messages
 
   const handleFileChange = event => {
     setFile(event.target.files[0]);
@@ -16,9 +17,9 @@ function App() {
 
   const handleSubmit = async event => {
     event.preventDefault();
-    console.log("Form submitted");
+    setError('');  // Clear existing errors
     if (!file || !numQuestions || !apiKey) {
-      alert('All fields are required!');
+      setError('All fields are required!');
       return;
     }
 
@@ -34,10 +35,15 @@ function App() {
       });
 
       const data = await response.json();
-      console.log("Response data:", data);
-      setQuestions(data.text);  // Adjust this if the API returns the questions directly
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Server responded with an error');
+      }
+
+      setQuestions(data.questions.join('\n'));  // Display the questions
     } catch (error) {
       console.error('Error generating questions:', error);
+      setError(error.message);
     }
   };
 
@@ -62,6 +68,7 @@ function App() {
         <button type="submit">Generate Quiz</button>
       </form>
       <br />
+      {error && <p style={{ color: 'red' }}>{error}</p>}  {/* Display error messages */}
       <label>
         Generated Quiz Questions:
         <textarea value={questions} readOnly rows="10" cols="50" />
