@@ -20,6 +20,9 @@ def upload_file():
     loader = PyMuPDFLoader(temp_path)
     documents = loader.load()
     text = " ".join([doc.page_content for doc in documents])
+
+    print(text)
+
     os.remove(temp_path)
 
     client = openai.OpenAI(api_key=request.form['apiKey'])
